@@ -1,0 +1,7 @@
+.local-top-header{
+  display : flex ; 
+  width : 30%;
+  height : 200px; 
+  justify-content: center;
+  align-items: center;
+}
