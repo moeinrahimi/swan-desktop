@@ -1,10 +1,11 @@
 const {Menu, Tray} = require('electron')
 const electron = require('electron')
+const fs = require('fs')
 const isDev = require('electron-is-dev');
 const db = require('./helpers/models');
-
+const dataurl = require('dataurl')
 db.sequelize.sync(
-  // {force: true}
+  {force: true}
 ).catch(err=>{
   console.log(`Sequelize issue:\nerr name :${err.name}\nerr message :  ${err.message}`)
 });
@@ -24,7 +25,29 @@ const path =require('path')
 const ipcMain = electron.ipcMain
 ipcMain.on('saveDir',(event,arg)=>{
   console.log(arg[0] ,' save dir electron js ',event)
-  song.findSongs(arg[0])
+  let directory = arg[0]
+  song.findSongs(directory)
+
+})
+
+const convertSong = (filePath) => {
+  const songPromise = new Promise((resolve, reject) => {
+    fs.readFile(filePath, (err, data) => {
+      if (err) { reject(err); }
+      resolve(dataurl.convert({ data, mimetype: 'audio/mp3' }));
+    });
+  });
+  return songPromise;
+};
+ipcMain.on('songDataUrl',async (event,arg)=>{
+
+  
+  let path = arg
+  let songData = await convertSong(path)
+  console.log(songData ,' data ')
+  event.sender.send('dataurl',songData)
+
+  
 
 })
 
@@ -45,13 +68,9 @@ async function createWindow () {
     mainWindow = null
   })
   ipcMain.on('getSongs',async(event)=>{
-
-  
-  
-  let songs = await db.Song.all()
-  console.log(JSON.stringify(songs),'aaa')
-  event.sender.send('songs',songs)
-})
+    let songs = await db.Song.all({raw:true})
+    event.sender.send('songs',songs)
+  })
   
 }
 

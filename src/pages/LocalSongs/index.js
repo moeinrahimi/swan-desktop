@@ -49,7 +49,9 @@ class LocalSongs extends Component{
   async componentDidMount(){
     ipcRenderer.send('getSongs')
     ipcRenderer.on('songs',(e,data)=>{
-      console.log(data,'songs')
+      this.setState({
+        songs : data 
+      })
     })
     // this.setState({songs : favorited.favorites})
     
@@ -62,9 +64,10 @@ class LocalSongs extends Component{
 
   _saveDirectoryLocal = async () =>{
     try{
-      dialog.showOpenDialog({properties: ['openFile', 'openDirectory', 'multiSelections']} ,(dir) =>{
-        console.log(dir)
-        ipcRenderer.send('saveDir',dir)
+      dialog.showOpenDialog({properties: ['openDirectory']} ,(dir) =>{
+        console.log(dir,'dir')
+        if(dir)
+          ipcRenderer.send('saveDir',dir)
         
       }) 
         

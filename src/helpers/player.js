@@ -1,6 +1,10 @@
 import axios from 'axios'
 import Sound from 'react-sound'
 import config from '../constants/config'
+import {isDesktop} from "./electron/utils";
+
+const electron = window.require('electron');
+const ipcRenderer = electron.ipcRenderer
 const play = async (album, reduxProps) => {
   console.log(reduxProps,'as')
   let { data } = await axios(config.baseURL+`album/songs?albumId=${album.id}`)
@@ -75,6 +79,32 @@ const setSongDetails  = (props,songUrl,playingStatus,songIndex,id)=>{
   
 })
 }
+const setSongBasedOnPlatform = (song,index,redux) => {
+ if (isDesktop()) {
+   let songUrl = song.fullPath
+   ipcRenderer.send('songDataUrl',song.fullPath)
+   ipcRenderer.on('dataurl',(e,data)=>{
+     let songBase64 = data 
+     return setSongsData(songBase64,index,song,redux)
+ })
+ }else{
+   return setSongsData(song.songUrl,index,song,redux)
+ }
+ 
+
+ }
+
+const setSongsData = (songUrl,i,song,redux) => {
+ redux.setSongDetails({
+   songURL: songUrl,
+   playingStatus: Sound.status.PLAYING,
+   songIndex: i,
+   songId: song.id,
+ })
+ redux.audio.src = songUrl
+ redux.audio.play()
+ redux.setIsPlaying(1)
+}
 export {
-  play,setTitle,playPlaylist,togglePlay
+  play,setTitle,playPlaylist,togglePlay,setSongBasedOnPlatform
 }

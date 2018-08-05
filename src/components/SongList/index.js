@@ -5,10 +5,14 @@ import config from '../../constants/config'
 import axios from 'axios'
 import { toast } from 'react-toastify';
 
-import {play,setTitle,togglePlay} from '../../helpers/player';
-import { setCurrentSong ,setSongDetails,setIsPlaying,setSongs} from "../../redux/albums/actions/index";
+import {play,setTitle,togglePlay,setSongBasedOnPlatform} from '../../helpers/player';
+import { setCurrentSong ,setSongDetails,setIsPlaying,setSongs,setCurrentAlbum} from "../../redux/albums/actions/index";
 import { connect } from "react-redux";
 import Sound from "react-sound";
+import {isDesktop} from "../../helpers/electron/utils";
+
+const electron = window.require('electron');
+const ipcRenderer = electron.ipcRenderer
 const mapStateToProps = state => {
   return {
     song: state.song,
@@ -25,6 +29,7 @@ return {
   setCurrentSong: song => dispatch(setCurrentSong(song)),
   setIsPlaying: song => dispatch(setIsPlaying(song)),
   setSongs: songs => dispatch(setSongs(songs)),
+  setCurrentAlbum: songs => dispatch(setCurrentAlbum(songs)),
 
 };
 };
@@ -36,25 +41,17 @@ class SongList extends Component{
       playlists : []
     }
   }
-   playSong = async (song,i) => {
-    this.props.setCurrentSong(song)    
-    this.props.setSongs(this.props.songs)    
-    setTitle(song)
-    let songUrl = song.fullPath
-    songUrl = `${config.baseURL}songs/play?path=${encodeURIComponent(songUrl)}`
-    this.props.setSongDetails({
-        songURL: songUrl,
-        playingStatus: Sound.status.PLAYING,
-        songIndex: i,
-        songId: song.id,
-      
-    })
-    this.props.audio.src = songUrl
-    this.props.audio.play()
-    this.props.setIsPlaying(1)
-  
-  
+  playSong = async (song,index) => {
+    console.log(song)
+  this.props.setCurrentSong(song)    
+  this.props.setCurrentAlbum([])    
+  this.props.setSongs(this.props.songs)    
+  setTitle(song)
+  let songUrl = song.fullPath
+  songUrl = `${config.baseURL}songs/play?path=${encodeURIComponent(songUrl)}`
+  setSongBasedOnPlatform(song,index,this.props)
   }
+  
   async componentDidMount(){
     let {data} = await axios(`${config.baseURL}playlists`)
     this.setState({

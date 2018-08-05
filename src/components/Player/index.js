@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import './style.css'
 import config from '../../constants/config'
 import helper from './helper'
-import {togglePlay} from '../../helpers/player'
+import {togglePlay,setSongBasedOnPlatform,} from '../../helpers/player'
 import {setSongDetails,setCurrentSong,setIsPlaying} from "../../redux/albums/actions/index";
 import { connect } from "react-redux";
 import favortiedSongs from '../../helpers/favortiedSongs';
-
+import Image from '../Image'
 const mapStateToProps = state => {
   return { song: state.song,
     audio : state.audio,
@@ -24,7 +24,6 @@ return {
 
 };
 };
-let noArtworkImage = config.baseURL + 'default.jpg'
 
 class Player extends Component {
   constructor(props){
@@ -143,17 +142,10 @@ class Player extends Component {
 
     let song = songs[songIndex]
     // console.log(song,'aaaa')
-    let songPath = song.fullPath
-    let songURL = `${config.baseURL}songs/play?path=${encodeURIComponent(songPath)}`
-    audio.src = songURL
     this.setTitle(song)
-    this.props.setSongDetails({
-      songIndex: songIndex,
-      songURL: songURL,
-      songId: song.id,
-    })
     this.props.setCurrentSong(song)
-    audio.play()
+    return setSongBasedOnPlatform(song,songIndex,this.props)
+   
   }
   setEplapsed = (elapsed,total,position)=>{
         this.setState({
@@ -196,7 +188,8 @@ class Player extends Component {
         <div className="column is-2">
           <div id="currently-playing">
             <div id="currently-cover">
-            <img src={album.artwork ? config.baseURL + album.artwork : noArtworkImage} alt="" />
+            
+            <Image image={album.artwork} />
             </div>
             <div id="currently-text">
               <span><a href="" className="link">{song.title}</a></span>

@@ -85,16 +85,15 @@ var findSongs = async function (directory,musics)  {
           //   meta.color = color       
             meta.dirName = dirName
             meta.title = meta.title || meta.artist.join(',')
-            // meta.directoryId = directory.id
+            meta.directoryId = directory.id
             meta.baseDir = baseDir
             meta.dir = baseDir
             meta.genre = meta.genre.toString()
             meta.artist = meta.artist.toString()
             musics.push(meta)
-            // let album = await createAlbum(meta)
-            saveSong(meta)
+            let album = await createAlbum(meta)
+            await saveSong(meta,album)
         }
-
       }
     
 }catch(e){
@@ -120,7 +119,7 @@ function createAlbum(song){
       resolve(album[0])
       if(album[1] == true){
         let image =  album[0].title+'.jpg'
-        let artowrkAbsolutePath ='./public/'+image 
+        let artowrkAbsolutePath ='../src/assets/img/songs/'+image 
         let artist = song.artist || ''
         getArtwork(album[0].title + ' ' + artist  ).then(artwork=>{
           // console.log(artwork`,'slmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm')   
