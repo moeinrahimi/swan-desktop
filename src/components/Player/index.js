@@ -189,7 +189,7 @@ class Player extends Component {
           <div id="currently-playing">
             <div id="currently-cover">
             
-            <Image image={album.artwork} />
+            <Image image={album.artwork || song.artwork} />
             </div>
             <div id="currently-text">
               <span><a href="" className="link">{song.title}</a></span>

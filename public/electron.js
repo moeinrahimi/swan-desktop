@@ -24,7 +24,7 @@ const song=  require('./helpers/song')
 const path =require('path')
 const ipcMain = electron.ipcMain
 ipcMain.on('saveDir',(event,arg)=>{
-  console.log(arg[0] ,' save dir electron js ',event)
+  // console.log(arg[0] ,' save dir electron js ',event)
   let directory = arg[0]
   song.findSongs(directory)
 
@@ -44,7 +44,7 @@ ipcMain.on('songDataUrl',async (event,arg)=>{
   
   let path = arg
   let songData = await convertSong(path)
-  console.log(songData ,' data ')
+  // console.log(songData ,' data ')
   event.sender.send('dataurl',songData)
 
   

@@ -1,0 +1,44 @@
+{
+  "name": "swarn-player",
+  "version": "0.1.0",
+  "dependencies": {
+    "axios": "^0.9.1",
+    "babel-preset-react": "^6.5.0",
+    "babelify": "^7.2.0",
+    "dataurl": "^0.1.0",
+    "electron-is-dev": "^0.3.0",
+    "electron-rebuild": "^1.8.2",
+    "musicmetadata": "^2.0.5",
+    "react": "^0.14.8",
+    "react-dom": "^0.14.7",
+    "react-redux": "^5.0.7",
+    "react-router-dom": "^4.3.1",
+    "react-scripts": "1.0.17",
+    "react-sound": "^0.4.0",
+    "react-toastify": "^4.1.0",
+    "redux": "^4.0.0",
+    "sequelize": "^4.38.0",
+    "soundmanager2": "^2.97.20150601-a",
+    "sqlite3": "^4.0.2"
+  },
+  "devDependencies": {
+    "concurrently": "^3.5.1",
+    "electron": "*",
+    "electron-builder": "^20.5.1",
+    "wait-on": "^2.1.0"
+  },
+  "main": "public/electron.js",
+  "scripts": {
+    "start": "react-scripts start",
+    "dev": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "server": "cd server && npm start",
+    "electron": "cd public && electromon electron.js",
+    "electron-dev": "concurrently \"yarn start\" \"wait-on http://localhost:3000 && electron .\"",
+    "electron-pack": "build x64.main=build/electron.js",
+    "ship": "build --config=electron-builder.yml -p always",
+    "rebuild": "electron-rebuild -f -w sqlite3"
+  }
+}

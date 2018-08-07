@@ -91,8 +91,15 @@ var findSongs = async function (directory,musics)  {
             meta.genre = meta.genre.toString()
             meta.artist = meta.artist.toString()
             musics.push(meta)
-            let album = await createAlbum(meta)
-            await saveSong(meta,album)
+            let picture = meta.picture.length > 0 ?  meta.picture[0].data : null 
+            if(picture){
+              meta.picture = Buffer.from(picture).toString('base64')
+              console.log(meta.picture,'aaaaaaaaaaaaaaaaaaa')
+            }
+            
+      //  console.log(JSON.stringify(meta.picture[0].data))
+
+            await saveSong(meta)
         }
       }
     
@@ -108,74 +115,18 @@ var findSongs = async function (directory,musics)  {
   throw e
 }
  }
-function createAlbum(song){
-  return new Promise((resolve,reject)=>{
-    db.Album.findOrCreate({
-      where : {
-        title : song.album,
-        artist : song.artist
-      }
-    }).then((album)=>{
-      resolve(album[0])
-      if(album[1] == true){
-        let image =  album[0].title+'.jpg'
-        let artowrkAbsolutePath ='../src/assets/img/songs/'+image 
-        let artist = song.artist || ''
-        getArtwork(album[0].title + ' ' + artist  ).then(artwork=>{
-          // console.log(artwork`,'slmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm')   
-            if(artwork){
-               saveArtwork(artwork,artowrkAbsolutePath).then(saveImage =>{
-                // console.log(saveImage,'-----------')
-                db.Album.update({
-                  artwork : image 
-                },{
-                  where : {
-                    id : album[0].id 
-                  }
-                })
-               })
-            }
-           }).catch(e=>{
-             console.log(e,'got error getArtwork')
-           })
-         
-      }
-    })
-    
-    
-  })
 
-}
- const saveArtwork= async (url,path) => {
-   try{
-     console.log(url,'aaaa')
-    let {data} = await axios.get(url, {
-      responseType: 'arraybuffer' 
-  })
-    // console.log(data,'---------')
-    
-    fs.writeFileSync(path,data)
-    return true
-   }catch(e){
-     console.log(e,'eeeeeeeeeeeeeeeeeeeeee')
-   }
-  
-  // console.log(artworkBuffer)
- }
 
- const saveSong =  async (meta,album) =>{
+
+ const saveSong =  async (meta) =>{
   //  console.log(meta.duration,'durationnnnnnnnnnnnnnnnnn')
-   
   return db.Song.findOrCreate({
     where : {
       path : meta.fullPath
     },
     defaults : {
       title : meta.title,
-      album :meta.album,
-      // albummId : album.id , 
-      // directoryId : meta.directoryId,
-      // artwork :meta.name,
+      artwork :meta.picture,
       // fileName :meta.name,
       genre :meta.genre,
       artist :meta.artist,

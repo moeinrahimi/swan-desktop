@@ -3,7 +3,7 @@ import { Switch,BrowserRouter as Router, Route, Link,IndexRoute } from "react-ro
 import 'react-toastify/dist/ReactToastify.css';
 import AlbumPage from './pages/AlbumPage'
 import LocalSongs from './pages/LocalSongs';
-
+import {togglePlay,setSongBasedOnPlatform,} from './helpers/player'
 import Collection from './pages/Collection'
 import FavoritedSongs from './pages/FavoritedSongs'
 import Search from './pages/Search'
@@ -23,6 +23,7 @@ import { connect } from "react-redux";
 const mapStateToProps = state => {
   return { song: state.song,
   songs:state.songs,
+  audio:state.audio,
   songURL:state.songURL,
   playingStatus:state.playingStatus,
   songIndex:state.songIndex,
@@ -78,7 +79,7 @@ class Routes extends Component {
   }
   _keyBoardListener = (e) => {
     if (e.keyCode == 112) {
-      // this.TogglePlay()
+      togglePlay(this.props)
     }
 
   }
@@ -87,7 +88,7 @@ class Routes extends Component {
     this.getMusicDirs()
     this.getRecentlySongs()
     document.addEventListener('keydown', this._keyBoardListener, false)
-
+       
   }
 
   playAlbum = async (album) => {
