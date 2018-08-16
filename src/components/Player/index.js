@@ -89,8 +89,10 @@ class Player extends Component {
     })
   }
   PreviousSong = () => {
+    
     let { songs, songIndex,audio } = this.props
     const songsLength = songs.length
+    audio.pause()
     songIndex -= 1
     if (songIndex == -1) {
       songIndex = 0
@@ -98,14 +100,15 @@ class Player extends Component {
     let song = songs[songIndex]
     let songPath = song.fullPath
     let songURL = `${config.baseURL}songs/play?path=${encodeURIComponent(songPath)}`
-    audio.src=songURL
-    audio.play()
+    // audio.src=songURL
+    // audio.play()
     this.setTitle(song)
     this.props.setSongDetails({
       songIndex: songIndex,
       songURL: songURL
     })
     this.props.setCurrentSong(song)
+    return setSongBasedOnPlatform(song,songIndex,this.props)
   }
   setTitle = (song) => {
     let artist 

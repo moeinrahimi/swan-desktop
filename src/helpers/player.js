@@ -101,9 +101,21 @@ const setSongsData = (songUrl,i,song,redux) => {
    songIndex: i,
    songId: song.id,
  })
- redux.audio.src = songUrl
- redux.audio.play()
- redux.setIsPlaying(1)
+ 
+
+
+  redux.audio.src = songUrl
+  redux.audio.play()
+  .then(_=>{
+    redux.setIsPlaying(1)
+
+  }) .catch(error => {
+    console.log(error,'setSongsData func')
+
+  });
+
+
+ 
 }
 export {
   play,setTitle,playPlaylist,togglePlay,setSongBasedOnPlatform
