@@ -3,8 +3,8 @@ var sequelize = new Sequelize('swan',null,null, {
   host: 'localhost',
   dialect: 'sqlite',
   charset: 'utf8',
-  logging: true,
-  storage: '../swan-db.sqlite',
+  // logging: true,
+  storage: './swan-db.sqlite',
 
 
 })

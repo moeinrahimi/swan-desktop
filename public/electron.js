@@ -1,12 +1,12 @@
-const {Menu, Tray} = require('electron')
+const { Menu, Tray } = require('electron')
 const electron = require('electron')
 const fs = require('fs')
 const isDev = require('electron-is-dev');
 const db = require('./helpers/models');
 const dataurl = require('dataurl')
 db.sequelize.sync(
-  {force: true}
-).catch(err=>{
+  // {force: true}
+).catch(err => {
   console.log(`Sequelize issue:\nerr name :${err.name}\nerr message :  ${err.message}`)
 });
 const app = electron.app
@@ -19,11 +19,11 @@ const BrowserWindow = electron.BrowserWindow
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
-const song=  require('./helpers/song')
+const song = require('./helpers/song')
 
-const path =require('path')
+const path = require('path')
 const ipcMain = electron.ipcMain
-ipcMain.on('saveDir',(event,arg)=>{
+ipcMain.on('saveDir', (event, arg) => {
   // console.log(arg[0] ,' save dir electron js ',event)
   let directory = arg[0]
   song.findSongs(directory)
@@ -39,24 +39,24 @@ const convertSong = (filePath) => {
   });
   return songPromise;
 };
-ipcMain.on('songDataUrl',async (event,arg)=>{
+ipcMain.on('songDataUrl', async (event, arg) => {
 
-  
+
   let path = arg
   let songData = await convertSong(path)
   // console.log(songData ,' data ')
-  event.sender.send('dataurl',songData)
+  event.sender.send('dataurl', songData)
 
-  
+
 
 })
 
 
 
-async function createWindow () {
+async function createWindow() {
   // Create the browser window.
 
-  mainWindow = new BrowserWindow({width:800,height:600})
+  mainWindow = new BrowserWindow({ width: 800, height: 600 })
 
   mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`);
   // mainWindow.webContents.openDevTools()
@@ -67,18 +67,18 @@ async function createWindow () {
     // when you should delete the corresponding element.
     mainWindow = null
   })
-  ipcMain.on('getSongs',async(event)=>{
-    let songs = await db.Song.all({raw:true})
-    event.sender.send('songs',songs)
+  ipcMain.on('getSongs', async (event) => {
+    let songs = await db.Song.all({ raw: true })
+    event.sender.send('songs', songs)
   })
-  
+
 }
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', createWindow)
-  
+
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
