@@ -11,7 +11,8 @@ import PlaylistPage from './pages/PlaylistPage'
 import Settings from './components/Settings';
 import SideBar from './components/SideBar'
 import axios from 'axios'
-import { ToastContainer, toast } from 'react-toastify';
+import Notifications from 'react-notify-toast';
+import {notify} from './helpers/notify'
 import Player from './components/Player/index';
 import Home from './components/Home';
 import {play} from './helpers/player';
@@ -19,7 +20,9 @@ import request from './helpers/request'
 import config from './constants/config'
 import { setAlbums,setCurrentSong ,setSongDetails,setIsPlaying,setSongs,setAlbum,setCurrentAlbum} from "./redux/albums/actions/index";
 import { connect } from "react-redux";
+const {whyDidYouUpdate} = require('why-did-you-update');
 
+whyDidYouUpdate(React);
 const mapStateToProps = state => {
   return { song: state.song,
   songs:state.songs,
@@ -63,7 +66,7 @@ class Routes extends Component {
       
     } catch (e) {
       console.log(e)
-      toast.error('error while trying to get music directories')
+      notify('error while trying to get music directories','error')
     }
   }
   getRecentlySongs = async () => {
@@ -74,7 +77,7 @@ class Routes extends Component {
       })
     } catch (e) {
       console.log(e)
-      toast.error('error while trying to get music directories')
+      notify('error while trying to get music directories','error')
     }
   }
   _keyBoardListener = (e) => {
@@ -114,7 +117,7 @@ settingsModal = (a)=>{
     const {  audio, isPlaying, song, currentAlbum } = this.props
     return (
       <div>
-        <ToastContainer autoClose={3000} />
+        <Notifications />
         <div className="columns is-gapless">
           <div className="column is-1">
             <SideBar settingsModal={this.settingsModal} />
@@ -122,8 +125,6 @@ settingsModal = (a)=>{
           <div className="column">
 
             <div className="main">
-
-
 
               <Settings getMusicDirs={this.getMusicDirs} ref={instance => { this.settings = instance }} />
 
