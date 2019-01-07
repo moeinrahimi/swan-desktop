@@ -1,9 +1,11 @@
+
 var Sequelize = require('sequelize');
 var sequelize = new Sequelize('swan',null,null, {
   host: 'localhost',
   dialect: 'sqlite',
   charset: 'utf8',
-  // logging: true,
+  logging: console.log,
+  // logging: false,
   storage: './swan-db.sqlite',
 
 

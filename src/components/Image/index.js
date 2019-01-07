@@ -7,7 +7,9 @@ const Image = (props =>{
     image = 'data:image/jpeg;base64,' + props.image 
   }
   return ( 
-    <img src={props.image   ?  image  : defaultImage}/>
+    < img src ="http://localhost:8080/birth.jpg" 
+    />
+    // <img src={props.image   ?  image  : defaultImage}/>
  ) 
 })
 export default Image 

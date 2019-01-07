@@ -2,6 +2,7 @@ import axios from 'axios'
 import Sound from 'react-sound'
 import config from '../constants/config'
 import {isDesktop} from "./electron/utils";
+import helper from '../components/Player/helper'
 
 const electron = window.require('electron');
 const ipcRenderer = electron.ipcRenderer
@@ -51,14 +52,16 @@ const togglePlay = (props) => {
   let {audio} = props
   if(!audio.src)
     return 
+
     if (audio.paused) {
-      console.log('paused play')
+
+      console.log('paused play' ,audio.currentTime)
       audio.play()
       props.setSongDetails({ playingStatus: Sound.status.PLAYING})
       props.setIsPlaying(1)
     } else {
       audio.pause()
-      console.log(' play paused')
+      console.log(' play paused', audio.currentTime)
   
       props.setSongDetails({ playingStatus: Sound.status.PAUSED })
       props.setIsPlaying(0)
@@ -80,16 +83,14 @@ const setSongDetails  = (props,songUrl,playingStatus,songIndex,id)=>{
 })
 }
 const setSongBasedOnPlatform = (song,index,redux) => {
- if (isDesktop()) {
+  console.log(song)
    let songUrl = song.fullPath
    ipcRenderer.send('songDataUrl',song.fullPath)
    ipcRenderer.on('dataurl',(e,data)=>{
      let songBase64 = data 
      return setSongsData(songBase64,index,song,redux)
  })
- }else{
-   return setSongsData(song.songUrl,index,song,redux)
- }
+
  
 
  }
@@ -102,7 +103,6 @@ const setSongsData = (songUrl,i,song,redux) => {
    songId: song.id,
  })
  
-
 
   redux.audio.src = songUrl
   redux.audio.play()
@@ -117,6 +117,61 @@ const setSongsData = (songUrl,i,song,redux) => {
 
  
 }
+const nextSong = (props) => {
+
+      let { audio, songs, songIndex, shuffle } = props
+      audio.pause()
+      console.log(songIndex, 'indexxxxxxxxxxxxxxxxxxx')
+
+      const songsLength = songs.length
+
+      // songIndex = parseInt(songIndex)
+      songIndex += 1
+      console.log(songsLength, 'songs len', songIndex)
+      if (songIndex >= songsLength) {
+          if (shuffle) {
+              songIndex = 0
+          }
+
+      }
+
+      if (songIndex >= songsLength) {
+          props.setIsPlaying(0)
+          helper.resetProgressBar()
+          return
+      }
+
+      let song = songs[songIndex]
+      // console.log(song,'aaaa')
+      setTitle(song)
+      props.setCurrentSong(song)
+      return setSongBasedOnPlatform(song, songIndex, props)
+
+  }
+
+    const previousSong = (props) => {
+
+        let { songs, songIndex, audio } = props
+        const songsLength = songs.length
+        audio.pause()
+        songIndex -= 1
+        if (songIndex == -1) {
+            songIndex = 0
+        }
+        let song = songs[songIndex]
+        let songPath = song.fullPath
+        let songURL = `${config.baseURL}songs/play?path=${encodeURIComponent(songPath)}`
+        // audio.src=songURL
+        // audio.play()
+        setTitle(song)
+        props.setSongDetails({
+            songIndex: songIndex,
+            songURL: songURL
+        })
+        props.setCurrentSong(song)
+        return setSongBasedOnPlatform(song, songIndex, props)
+    }
+
 export {
-  play,setTitle,playPlaylist,togglePlay,setSongBasedOnPlatform
+  play, setTitle, playPlaylist, togglePlay, setSongBasedOnPlatform, nextSong, previousSong
 }

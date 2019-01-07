@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import './style.css'
 import config from '../../constants/config'
 import helper from './helper'
-import {togglePlay,setSongBasedOnPlatform,} from '../../helpers/player'
+import { togglePlay, setSongBasedOnPlatform, previousSong, nextSong } from '../../helpers/player'
 import {setSongDetails,setCurrentSong,setIsPlaying} from "../../redux/albums/actions/index";
 import { connect } from "react-redux";
 import favortiedSongs from '../../helpers/favortiedSongs';
@@ -49,8 +49,7 @@ class Player extends Component {
         total: '00:00',
         position : 0 
       })
-      
-      this.NextSong()
+      nextSong(this.props)
     
     })
     let progressBarWidth = 642
@@ -87,68 +86,6 @@ class Player extends Component {
       volumeIcon.className = 'link flaticon-mute-volume'
         
     })
-  }
-  PreviousSong = () => {
-    
-    let { songs, songIndex,audio } = this.props
-    const songsLength = songs.length
-    audio.pause()
-    songIndex -= 1
-    if (songIndex == -1) {
-      songIndex = 0
-    }
-    let song = songs[songIndex]
-    let songPath = song.fullPath
-    let songURL = `${config.baseURL}songs/play?path=${encodeURIComponent(songPath)}`
-    // audio.src=songURL
-    // audio.play()
-    this.setTitle(song)
-    this.props.setSongDetails({
-      songIndex: songIndex,
-      songURL: songURL
-    })
-    this.props.setCurrentSong(song)
-    return setSongBasedOnPlatform(song,songIndex,this.props)
-  }
-  setTitle = (song) => {
-    let artist 
-    if(Array.isArray(song.artist)){
-      artist = song.artist[0]
-    }else{
-      artist = song.artist
-    }
-    document.title = `${song.title || 'Unknown'} - ${artist || 'Unknown'}`
-  }
-  NextSong = () => {
-    
-    let {audio ,  songs, songIndex , shuffle} = this.props
-    audio.pause()
-    console.log(songIndex,'indexxxxxxxxxxxxxxxxxxx')
-    
-    const songsLength = songs.length
-    
-    // songIndex = parseInt(songIndex)
-    songIndex += 1
-    console.log(songsLength,'songs len',songIndex)
-    if (songIndex >= songsLength) {
-      if(shuffle){
-        songIndex = 0
-      }
-      
-    }
-
-    if(songIndex >= songsLength) {
-      this.props.setIsPlaying(0)
-      helper.resetProgressBar()
-      return 
-    }
-
-    let song = songs[songIndex]
-    // console.log(song,'aaaa')
-    this.setTitle(song)
-    this.props.setCurrentSong(song)
-    return setSongBasedOnPlatform(song,songIndex,this.props)
-   
   }
   setEplapsed = (elapsed,total,position)=>{
         this.setState({
@@ -218,9 +155,9 @@ class Player extends Component {
           <div id="player-controller">
             <div id="player-controls">
                 <i className="link flaticon-shuffle-button" onClick={this.props.shuffle}></i>
-                  <i className="link flaticon-back"  onClick={this.PreviousSong}></i>
+                  <i className = "link flaticon-back" onClick = { e => previousSong (this.props)}> </i>
                     <i className={(isPlaying == 1 ? 'link flaticon-pause' : 'link flaticon-play-button')} onClick={()=>togglePlay(this.props)} ></i>
-                      <i className="link flaticon-next" onClick={this.NextSong} ></i>
+                      <i className="link flaticon-next" onClick={e=>nextSong(this.props)} ></i>
                         <i className="link flaticon-repeat"></i>
             </div>
             <div id="progress-bar-container">

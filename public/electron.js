@@ -1,19 +1,23 @@
-const { Menu, Tray } = require('electron')
-const electron = require('electron')
+const { app, BrowserWindow, globalShortcut, ipcMain } = require('electron')
 const fs = require('fs')
 const isDev = require('electron-is-dev');
 const db = require('./helpers/models');
 const dataurl = require('dataurl')
+var static = require('node-static');
+console.log(__dirname + '/artworks')
+var fileServer = new static.Server(__dirname+'/artworks');
+
+require('http').createServer(function(request, response) {
+    request.addListener('end', function() {
+        fileServer.serve(request, response);
+    }).resume();
+}).listen(8080);
 db.sequelize.sync(
   // {force: true}
 ).catch(err => {
   console.log(`Sequelize issue:\nerr name :${err.name}\nerr message :  ${err.message}`)
 });
-const app = electron.app
 
-
-// Module to create native browser window.
-const BrowserWindow = electron.BrowserWindow
 
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -22,11 +26,14 @@ let mainWindow
 const song = require('./helpers/song')
 
 const path = require('path')
-const ipcMain = electron.ipcMain
 ipcMain.on('saveDir', (event, arg) => {
-  // console.log(arg[0] ,' save dir electron js ',event)
   let directory = arg[0]
-  song.findSongs(directory)
+  db.Directory.findOrCreate({
+    where :{path:directory}
+  }).then(dir=>{
+song.findSongs(dir[0])
+  })
+  
 
 })
 
@@ -56,9 +63,13 @@ ipcMain.on('songDataUrl', async (event, arg) => {
 async function createWindow() {
   // Create the browser window.
 
-  mainWindow = new BrowserWindow({ width: 800, height: 600 })
+  mainWindow = new BrowserWindow({
+      width: 1800,
+      height: 800,
+    
+  })
 
-  mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`);
+  mainWindow.loadURL(isDev ? 'http://localhost:3001' : `file://${path.join(__dirname, '../build/index.html')}`);
   // mainWindow.webContents.openDevTools()
 
   mainWindow.on('closed', function () {
@@ -77,7 +88,23 @@ async function createWindow() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow)
+app.on('ready', ()=>{
+
+  createWindow()
+   // https://electronjs.org/docs/api/accelerator keyboard cheatsheet
+   globalShortcut.register('MediaPlayPause', () => {
+       console.log('togglePlay is pressed')
+       mainWindow.webContents.send('togglePlay')
+   })
+   globalShortcut.register('MediaNextTrack', () => {
+       console.log('next pressed')
+        mainWindow.webContents.send('next')
+   })
+   globalShortcut.register('MediaPreviousTrack', () => {
+       console.log('previos pressed')
+        mainWindow.webContents.send('previous')
+   })
+})
 
 
 // Quit when all windows are closed.

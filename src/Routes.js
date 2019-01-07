@@ -3,7 +3,7 @@ import { Switch,BrowserRouter as Router, Route, Link,IndexRoute } from "react-ro
 import 'react-toastify/dist/ReactToastify.css';
 import AlbumPage from './pages/AlbumPage'
 import LocalSongs from './pages/LocalSongs';
-import {togglePlay,setSongBasedOnPlatform,} from './helpers/player'
+import { togglePlay, nextSong, previousSong } from './helpers/player'
 import Collection from './pages/Collection'
 import FavoritedSongs from './pages/FavoritedSongs'
 import Search from './pages/Search'
@@ -11,8 +11,8 @@ import PlaylistPage from './pages/PlaylistPage'
 import Settings from './components/Settings';
 import SideBar from './components/SideBar'
 import axios from 'axios'
-import Notifications from 'react-notify-toast';
-import {notify} from './helpers/notify'
+import { ToastContainer, toast } from 'react-toastify';
+
 import Player from './components/Player/index';
 import Home from './components/Home';
 import {play} from './helpers/player';
@@ -20,9 +20,11 @@ import request from './helpers/request'
 import config from './constants/config'
 import { setAlbums,setCurrentSong ,setSongDetails,setIsPlaying,setSongs,setAlbum,setCurrentAlbum} from "./redux/albums/actions/index";
 import { connect } from "react-redux";
-const {whyDidYouUpdate} = require('why-did-you-update');
+// const {whyDidYouUpdate} = require('why-did-you-update');
+const electron = window.require('electron');
+const ipcRenderer = electron.ipcRenderer
 
-whyDidYouUpdate(React);
+// whyDidYouUpdate(React);
 const mapStateToProps = state => {
   return { song: state.song,
   songs:state.songs,
@@ -66,7 +68,7 @@ class Routes extends Component {
       
     } catch (e) {
       console.log(e)
-      notify('error while trying to get music directories','error')
+      toast('error while trying to get music directories','error')
     }
   }
   getRecentlySongs = async () => {
@@ -77,20 +79,25 @@ class Routes extends Component {
       })
     } catch (e) {
       console.log(e)
-      notify('error while trying to get music directories','error')
+      toast('error while trying to get music directories','error')
     }
-  }
-  _keyBoardListener = (e) => {
-    if (e.keyCode == 112) {
-      togglePlay(this.props)
-    }
-
   }
   componentDidMount = () => {
-    console.log(this.player)
+    let _this = this
     this.getMusicDirs()
     this.getRecentlySongs()
-    document.addEventListener('keydown', this._keyBoardListener, false)
+    ipcRenderer.on('togglePlay',(e,message)=>{
+      console.log('inja',e)
+      togglePlay(this.props)
+    })
+    ipcRenderer.on('next', (e, message) => {
+      console.log('next', this.player)
+      nextSong(_this.props)
+})
+    ipcRenderer.on('previous', (e, message) => {
+      console.log('previous', this.player)
+      previousSong(_this.props)
+})
        
   }
 
@@ -117,12 +124,12 @@ settingsModal = (a)=>{
     const {  audio, isPlaying, song, currentAlbum } = this.props
     return (
       <div>
-        <Notifications />
-        <div className="columns is-gapless">
+       <ToastContainer autoClose={3000}/>
+        <div className="columns ">
           <div className="column is-1">
             <SideBar settingsModal={this.settingsModal} />
           </div>
-          <div className="column">
+          <div className="column is-11">
 
             <div className="main">
 
@@ -159,7 +166,6 @@ settingsModal = (a)=>{
 
             <Player
               ref={instance => { this.player = instance }}
-              NextSong={this.NextSong}
               audio={audio}
               isPlaying={isPlaying}
               song={song}
