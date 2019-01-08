@@ -5,7 +5,7 @@ import config from '../../constants/config'
 import axios from 'axios'
 import { toast } from 'react-toastify';
 
-import {play,setTitle,togglePlay,setSongBasedOnPlatform} from '../../helpers/player';
+import { play, setTitle, togglePlay, setSongBasedOnPlatform, formatTime } from '../../helpers/player';
 import { setCurrentSong ,setSongDetails,setIsPlaying,setSongs,setCurrentAlbum} from "../../redux/albums/actions/index";
 import { connect } from "react-redux";
 import Sound from "react-sound";
@@ -79,6 +79,9 @@ class SongList extends Component{
   }
   
    _renderView = (song, index) => {
+     let duration = '00:00'
+     if(song.duration)
+       duration = formatTime(song.duration)
     return (
   
       <div className="song">
@@ -116,7 +119,7 @@ class SongList extends Component{
               </div>
             </div>
           </div>
-          <span>{song.duration * 60}</span>
+          <span> { duration } </span>
   
         </div>
   

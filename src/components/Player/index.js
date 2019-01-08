@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import './style.css'
 import config from '../../constants/config'
 import helper from './helper'
-import { togglePlay, setSongBasedOnPlatform, previousSong, nextSong } from '../../helpers/player'
+import { togglePlay, setSongBasedOnPlatform, previousSong, nextSong,formatTime } from '../../helpers/player'
 import {setSongDetails,setCurrentSong,setIsPlaying} from "../../redux/albums/actions/index";
 import { connect } from "react-redux";
 import favortiedSongs from '../../helpers/favortiedSongs';
@@ -94,17 +94,11 @@ class Player extends Component {
         position : position
     })
   }
-  formatTime = (time) =>{
-    return time < 10 ? '0' + time.toString().trim() : time
-  }
+  
 
   handleSongPlaying = (audio) => {
-    let currentMinutes = this.formatTime(Math.floor(audio.currentTime / 60))
-    let currentSeconds = this.formatTime(Math.floor(audio.currentTime % 60))
-    let totaltMinutes = this.formatTime(Math.floor(audio.duration / 60))
-    let totalSeconds = this.formatTime(Math.floor(audio.duration / 60))
-    let elapsed = currentMinutes + ':' + currentSeconds
-    let total = totaltMinutes + ':' + totalSeconds
+    let elapsed = formatTime(audio.currentTime)
+    let total = formatTime(audio.duration)
     this.setEplapsed(elapsed,total,audio.position)
     
   }
