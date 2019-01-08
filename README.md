@@ -23,15 +23,8 @@ swan-desktop under active development
 make sure you have a working installation of redis and mysql .
 
 ``` bash
-
-git clone https://github.com/moeinrahimi/swan-player.git
-
-cd swan-player
-
-node install.js // installs dependencies
-change server ip located at src/config.js if you need to defaults to localhost:8181
-at last simply run :
-npm start && npm run server
+npm install or yarn
+npm run electron-dev or yarn run electron-dev
 ```
 
   
@@ -51,8 +44,8 @@ npm start && npm run server
 
 - react with create react app
 - redux
-- mysql
-- nodejs express
+- sqlite
+- electorn 
 
 # Contributing
 
