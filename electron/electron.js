@@ -3,10 +3,11 @@ const fs = require('fs')
 const isDev = require('electron-is-dev');
 const db = require('./helpers/models');
 const dataurl = require('dataurl')
+const songHelper = require('./helpers/dbHelper/song')
 var static = require('node-static');
 console.log(__dirname + '/artworks')
 var fileServer = new static.Server(__dirname+'/artworks');
-
+const favoriteHelper = require('./helpers/favoriteSong')
 require('http').createServer(function(request, response) {
     request.addListener('end', function() {
         fileServer.serve(request, response);
@@ -34,6 +35,31 @@ ipcMain.on('saveDir', (event, arg) => {
 song.findSongs(dir[0])
   })
   
+
+})
+
+ipcMain.on('createFavortiteSong',async (event, arg) => {
+  let songId = arg
+  let result = await favoriteHelper.favoriteASong(songId)
+  let songResult = await songHelper.getSong(songId)
+  // console.log(result)
+    event.sender.send('createFavortiteSongResult', songResult.song)
+
+})
+
+ipcMain.on('deleteFavortiteSong',async (event, arg) => {
+  let songId = arg
+  let result = await favoriteHelper.deleteFavoritedSongs(songId)
+  let songResult = await songHelper.getSong(songId)
+  // console.log(result)
+    event.sender.send('deleteFavortiteSongResult', songResult.song)
+
+})
+
+ipcMain.on('favortiteSongs',async (event, arg) => {
+  
+  let result = await favoriteHelper.favoritedSongs()
+    event.sender.send('favoritedSongsResult', result)
 
 })
 
@@ -70,7 +96,7 @@ async function createWindow() {
   })
 
   mainWindow.loadURL(isDev ? 'http://localhost:3001' : `file://${path.join(__dirname, '../build/index.html')}`);
-  // mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
 
   mainWindow.on('closed', function () {
     // Dereference the window object, usually you would store windows
@@ -79,7 +105,12 @@ async function createWindow() {
     mainWindow = null
   })
   ipcMain.on('getSongs', async (event) => {
-    let songs = await db.Song.all({ raw: true })
+    let songs = await db.Song.all({
+      raw:true,
+      include:[
+        {model:db.FavoritedSong}
+      ]
+    })
     event.sender.send('songs', songs)
   })
 

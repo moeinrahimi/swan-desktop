@@ -151,7 +151,7 @@ async function createAlbum(song) {
                 let cleanFileName = fileName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
 
                 let image = cleanFileName + '.jpg'
-                let artowrkAbsolutePath = process.cwd() +'/public/artworks/' + image
+                let artowrkAbsolutePath = process.cwd() +'/artworks/' + image
                 let artist = song.artist || ''
                 if (song.picture && song.picture.length > 0) {
                     
@@ -214,7 +214,8 @@ const saveSong = async (meta, album) => {
             // color :meta.name,
             dirName: meta.dirName,
             fullPath: meta.fullPath,
-            duration: meta.duration
+            duration: meta.duration,
+            type : 'local'
         }
     })
 return song 

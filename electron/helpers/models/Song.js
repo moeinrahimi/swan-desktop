@@ -13,6 +13,7 @@ module.exports = function (sequelize,DataTypes){
     color : {type:DataTypes.STRING,defaultValue:0},
     dirName : {type:DataTypes.STRING,defaultValue:0},
     fullPath : {type:DataTypes.STRING,defaultValue:0},
+    type : {type:DataTypes.ENUM('local','remote'),defaultValue:'local'},
 
     
   })

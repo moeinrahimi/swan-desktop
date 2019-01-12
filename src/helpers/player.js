@@ -88,6 +88,7 @@ const setSongBasedOnPlatform = (song, index, redux) => {
     ipcRenderer.send('songDataUrl', song.fullPath)
     ipcRenderer.on('dataurl', (e, data) => {
         let songBase64 = data
+        console.log('inja')
         return setSongsData(songBase64, index, song, redux)
     })
 

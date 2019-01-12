@@ -3,6 +3,7 @@
 /.vscode
 .vscode/*
 ./public/swan-db.sqlite
+./swan-db.sqlite
 test.sqlite
 # dependencies
 /node_modules
@@ -26,4 +27,4 @@ yarn-error.log*
 yarn.lock
 package-lock.json
 /server/node_modules
-public/artworks/*
+electron/artworks/*

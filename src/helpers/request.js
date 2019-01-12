@@ -38,7 +38,7 @@ const getHistory = async()=>{
 const favoritedSongs = async()=>{
   try{
     let { data } = await axios(config.baseURL+`favorites`)
-    return data 
+    return data.favorites
   }catch(e){
     console.log(e,'favoritedSongs func')
   }

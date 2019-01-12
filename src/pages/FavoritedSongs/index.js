@@ -9,8 +9,7 @@ import { Switch,BrowserRouter as Router, Route, Link,IndexRoute } from "react-ro
 import {playPlaylist,setTitle,togglePlay} from '../../helpers/player';
 import { setAlbums,setCurrentSong ,setSongDetails,setIsPlaying,setSongs,setCurrentPlaylist} from "../../redux/albums/actions/index";
 import { connect } from "react-redux";
-
-
+import { getFavoritedSongsFromIPC } from '../../helpers/electron/ipcRequests'
 
 const mapStateToProps = state => {
   return { song: state.song,
@@ -48,9 +47,15 @@ class FavoritedSongs extends Component{
     }
   }
   async componentDidMount(){
-    let favorited = await request.favoritedSongs()
-    console.log(favorited)
-    this.setState({songs : favorited.favorites})
+    const promises = []
+
+    let result = await Promise.all([getFavoritedSongsFromIPC(), request.favoritedSongs()]).catch(e => console.log(e))
+    console.log(result)
+    result  = result.filter(r=>{
+      return r != undefined
+    })
+    result = [].concat(...result)
+    this.setState({ songs: result })
     
   } 
   togglePlaylistModal() {

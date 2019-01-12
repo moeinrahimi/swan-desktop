@@ -42,7 +42,7 @@ class SongList extends Component{
     }
   }
   playSong = async (song,index) => {
-    console.log(song)
+    // console.log(song)
   this.props.setCurrentSong(song)    
   this.props.setCurrentAlbum([])    
   this.props.setSongs(this.props.songs)    
@@ -79,6 +79,7 @@ class SongList extends Component{
   }
   
    _renderView = (song, index) => {
+     let isFavorited = song.favoritedSong || song["favoritedSong.id"]
      let duration = '00:00'
      if(song.duration)
        duration = formatTime(song.duration)
@@ -106,7 +107,7 @@ class SongList extends Component{
                 <a href="#" className="dropdown-item" onClick={() => this.showPlaylistModal(song)}>
                   Add to Playlist
                       </a>
-                {song.favoritedSong ?
+                { isFavorited ?
                   <a href="#" className="dropdown-item" onClick={() => favoritedSongs.removeFavoritesSong(song,this.props)}>
                     Remove Favorited Songs From Library
                       </a>

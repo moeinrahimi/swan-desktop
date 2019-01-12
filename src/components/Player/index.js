@@ -115,7 +115,7 @@ class Player extends Component {
      const {audio,isPlaying,song,album,position}=this.props
      const {total,elapsed} = this.state
      let progressBar = (position / audio.duration) * 100 
-      
+      let isFavorited = song.favoritedSong || song["favoritedSong.id"]
     return (
     <div id="player">
       <div className="columns">
@@ -123,7 +123,7 @@ class Player extends Component {
           <div id="currently-playing">
             <div id="currently-cover">
             
-            <Image image={album.artwork || song.artwork} />
+            <Image image={album.artwork} />
             </div>
             <div id="currently-text">
               <span><a href="" className="link">{song.title}</a></span>
@@ -133,7 +133,7 @@ class Player extends Component {
             
               {/* <i className={song.favoritedSong ? 'fa fa-heart' : 'far fa-heart'} onClick={()=>favortiedSongs.addSongToFavorites(song)}></i> */}
             
-            {song.favoritedSong ? 
+            { isFavorited ?
               <i className="fa fa-heart" onClick={()=>favortiedSongs.removeFavoritesSong(song,this.props)}></i>
               :
               <i className="flaticon-heart" onClick={()=>favortiedSongs.addSongToFavorites(song,this.props)}></i>
