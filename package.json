@@ -2,6 +2,7 @@
   "name": "swan-desktop",
   "version": "0.1.0",
   "main": "electron/electron.js",
+  "homepage": "./",
   "scripts": {
     "start": "react-scripts start",
     "dev": "react-scripts start",
@@ -20,12 +21,8 @@
     "babelify": "^7.2.0",
     "dataurl": "^0.1.0",
     "dexie": "^2.0.4",
-    "electron": "3.0.7",
+
     "electron-is-dev": "^0.3.0",
-    "electron-prebuilt": "^1.4.13",
-    "electron-rebuild": "^1.2.8",
-    "electron-reload": "^1.4.0",
-    "electron-reloader": "^0.2.0",
     "musicmetadata": "^2.0.5",
     "node-static": "^0.7.11",
     "react": "^15.0.1",
@@ -44,6 +41,24 @@
   "devDependencies": {
     "concurrently": "^3.5.1",
     "electron-builder": "^20.5.1",
-    "wait-on": "^2.1.0"
+    "wait-on": "^2.1.0",
+    "electron": "3.0.7",
+    "electron-prebuilt": "^1.4.13",
+    "electron-rebuild": "^1.2.8"
+  },
+  "build": {
+    "appId": "com.desktop-organizer.moeinrahimi",
+    "extends": null,
+    "win": {
+      "target": "nsis",
+      "icon":"public/icon.ico"
+    },
+    "publish": {
+      "provider": "github"
+    },
+    "directories": {
+      "buildResources": "assets"
+    }
   }
+
 }
