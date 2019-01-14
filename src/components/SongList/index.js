@@ -47,8 +47,6 @@ class SongList extends Component{
   this.props.setCurrentAlbum([])    
   this.props.setSongs(this.props.songs)    
   setTitle(song)
-  let songUrl = song.fullPath
-  songUrl = `${config.baseURL}songs/play?path=${encodeURIComponent(songUrl)}`
   setSongBasedOnPlatform(song,index,this.props)
   }
   

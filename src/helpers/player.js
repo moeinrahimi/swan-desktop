@@ -83,20 +83,26 @@ const setSongDetails = (props, songUrl, playingStatus, songIndex, id) => {
     })
 }
 const setSongBasedOnPlatform = (song, index, redux) => {
-    console.log(song)
-    let songUrl = song.fullPath
-    ipcRenderer.send('songDataUrl', song.fullPath)
-    ipcRenderer.on('dataurl', (e, data) => {
-        let songBase64 = data
-        console.log('inja')
-        return setSongsData(songBase64, index, song, redux)
-    })
+    // console.log(song)
+    let songPath = song.fullPath
+    if (song.type == 'local') {
+        ipcRenderer.send('songDataUrl', song.fullPath)
+        ipcRenderer.on('dataurl', (e, data) => {
+            let songBase64 = data
+            return setSongsData(songBase64, index, song, redux)
+        })
+    } else {
+        let songUrl = `${config.baseURL}songs/play?path=${encodeURIComponent(songPath)}`
+        return setSongsData(songUrl, index, song, redux)
+    }
+
 
 
 
 }
 
 const setSongsData = (songUrl, i, song, redux) => {
+    // console.log(songUrl, 'set song data')
     redux.setSongDetails({
         songURL: songUrl,
         playingStatus: Sound.status.PLAYING,
