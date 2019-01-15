@@ -55,6 +55,8 @@ you can in making swan-player better by contributing in adding new features to i
 
 # TODO List
 
+- [ ] shortcut key for swan-desktop built-in volume
+
 - [ ] list all songs
 
 - [ ] list all albums
