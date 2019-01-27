@@ -3,6 +3,7 @@ module.exports = function (sequelize,DataTypes){
     id: { primaryKey: true, type: DataTypes.INTEGER, autoIncrement: true},
     title : {type:DataTypes.STRING},
     artwork : {type:DataTypes.STRING},
-    artist : {type:DataTypes.STRING},
+    artist: { type: DataTypes.STRING },
+    type : {type:DataTypes.ENUM('local','remote'),defaultValue:'local'}
   })
 }

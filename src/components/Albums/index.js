@@ -34,7 +34,7 @@ import request from '../../helpers/request'
           setCurrentAlbum: album => dispatch(setCurrentAlbum(album)),
         };
         };
-        
+
         let noArtworkImage = config.baseURL + 'default.jpg'
        class Albums extends Component {
          componentDidMount(){
@@ -44,22 +44,24 @@ import request from '../../helpers/request'
           request.createHistory(this.props.songId,album.id)
           return play(album,this.props)
         }
-      
+
          play(album,i,isPlaying){
-           console.log(isPlaying , Object.keys(this.props.song).length > 0)
+          //  console.log(isPlaying , Object.keys(this.props.song).length > 0)
            if(isPlaying &&  Object.keys(this.props.song).length > 0)
            return togglePlay(this.props)
           this.playAlbum(album, i)
          }
-          _renderView = (album,index)=>{
+         _renderView = (album, index) => {
+
             let isPlaying = this.props.isPlaying
-            let currentSong = this.props.song
+           let currentSong = this.props.song
+          //  console.log(currentSong,'----------------')
             let condition = isPlaying && currentSong.albummId == album.id
-            let toggleCondition =  currentSong.albummId == album.id
-            
+            let toggleCondition =  currentSong && currentSong.albummId == album.id
+
            return (
-              <div className="column is-2">  
-            <div className={ condition ? ' music-thumb-active'  : 'music-thumb'} onClick={() => this.play(album,index,toggleCondition)}>            
+              <div className="column is-2">
+            <div className={ condition ? ' music-thumb-active'  : 'music-thumb'} onClick={() => this.play(album,index,toggleCondition)}>
               {/* <img src={ noArtworkImage} alt="" /> */}
               <img src={album.artwork ? config.baseURL + album.artwork : noArtworkImage} alt="" />
             <div className={condition ? "thumb-overlay-active" : "thumb-overlay"}>
@@ -68,7 +70,7 @@ import request from '../../helpers/request'
         </div>
         <div className="music-caption">
         <Link to={{ pathname: `/${album.id}`}}>{album.title}</Link>
-        </div>   
+        </div>
       </div>
            )
       }
@@ -76,21 +78,21 @@ import request from '../../helpers/request'
           return (
           <div id="special-music-wrapper">
           <div className="main-header-title">
-            <h1>{this.props.title}</h1>  
+            <h1>{this.props.title}</h1>
           </div>
-        
-          <div className="columns">        
+
+          <div className="columns">
             <div className="music-container">
-            {this.props.albums.map((album,index)=>{ 
+            {this.props.albums.map((album,index)=>{
         return (
-          <div  key={album.id}  > 
+          <div  key={album.id}  >
             {this._renderView(album,index)}
           </div>
         )
-          })}              
+          })}
           </div>
           </div>
-        
+
         </div>
         )
           }

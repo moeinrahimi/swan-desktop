@@ -20,7 +20,7 @@ return {
   setSongDetails: albums => dispatch(setSongDetails(albums)),
   setCurrentSong: song => dispatch(setCurrentSong(song)),
   setIsPlaying: song => dispatch(setIsPlaying(song)),
-  
+
 
 };
 };
@@ -31,7 +31,7 @@ class Player extends Component {
     this.state = {
       elapsed: '00:00',
       total: '00:00',
-      position : 0 
+      position : 0
   }
   }
   componentDidMount(){
@@ -47,10 +47,10 @@ class Player extends Component {
       this.setState({
         elapsed: '00:00',
         total: '00:00',
-        position : 0 
+        position : 0
       })
       nextSong(this.props)
-    
+
     })
     let progressBarWidth = 642
     document.querySelector('#middle-bar').addEventListener('mousedown',(e)=>{
@@ -71,8 +71,8 @@ class Player extends Component {
     let clickedPos = e.clientX - e.target.offsetLeft
     volumeChd.style.width = (clickedPos) + '%'
     audio.volume = clickedPos / 100
-    
-    
+
+
     },false)
     let volumeIcon = document.querySelector('#sound i')
     volumeIcon.addEventListener('click',(e)=>{
@@ -80,11 +80,11 @@ class Player extends Component {
       if(audio.muted){
         audio.muted = false
         volumeIcon.className = 'link flaticon-speaker'
-        return 
+        return
       }
-      audio.muted = true 
+      audio.muted = true
       volumeIcon.className = 'link flaticon-mute-volume'
-        
+
     })
   }
   setEplapsed = (elapsed,total,position)=>{
@@ -94,13 +94,13 @@ class Player extends Component {
         position : position
     })
   }
-  
+
 
   handleSongPlaying = (audio) => {
     let elapsed = formatTime(audio.currentTime)
     let total = formatTime(audio.duration)
     this.setEplapsed(elapsed,total,audio.position)
-    
+
   }
   moveSong = (e)=>{
     let {audio} = this.props
@@ -108,41 +108,42 @@ class Player extends Component {
     let newTime = (clickedPos  / e.target.offsetWidth) * audio.duration
     console.log(newTime ,'timer')
       audio.currentTime = 1
-    
-   
+
+
   }
   render(){
-     const {audio,isPlaying,song,album,position}=this.props
+    const { audio, isPlaying, song, album, position } = this.props
+
      const {total,elapsed} = this.state
-     let progressBar = (position / audio.duration) * 100 
-      let isFavorited = song.favoritedSong || song["favoritedSong.id"]
+     let progressBar = (position / audio.duration) * 100
+      let isFavorited = song && (song.favoritedSong || song["favoritedSong.id"])
     return (
     <div id="player">
       <div className="columns">
         <div className="column is-2">
           <div id="currently-playing">
             <div id="currently-cover">
-            
+
             <Image image={album.artwork} />
             </div>
             <div id="currently-text">
               <span><a href="" className="link">{song.title}</a></span>
               <h1>{song.artist}</h1>
             </div>
-            <div id="add-to-favaorite">          
-            
+            <div id="add-to-favaorite">
+
               {/* <i className={song.favoritedSong ? 'fa fa-heart' : 'far fa-heart'} onClick={()=>favortiedSongs.addSongToFavorites(song)}></i> */}
-            
+
             { isFavorited ?
               <i className="fa fa-heart" onClick={()=>favortiedSongs.removeFavoritesSong(song,this.props)}></i>
               :
               <i className="flaticon-heart" onClick={()=>favortiedSongs.addSongToFavorites(song,this.props)}></i>
             }
             </div>
-              
-              
-            
-            
+
+
+
+
           </div>
         </div>
         <div className="column is-8">
@@ -158,12 +159,12 @@ class Player extends Component {
               <span className="link">{elapsed}</span>
               <div id="progress-bar">
                 <div id="middle-bar">
-                
+
 
                   <div id="player-position" style={{width:progressBar + '%'}}>
-                  
+
                   </div>
-                  
+
                 </div>
               </div>
               <span className="link">{total}</span>
@@ -179,7 +180,7 @@ class Player extends Component {
           </div>
         </div>
       </div>
-      
+
     </div>
     )
   }

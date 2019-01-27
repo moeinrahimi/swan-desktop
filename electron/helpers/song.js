@@ -4,7 +4,7 @@ const path = require('path')
 const fs = require('fs')
 const db = require('./models')
 // const { emit } = require('./socket')
-console.log(__dirname , process.cwd())
+console.log(__dirname, process.cwd())
 const getMusicMeta = (file) => {
     return new Promise((resolve, reject) => {
         let stream = fs.createReadStream(file)
@@ -53,7 +53,7 @@ const getDirFiles = (dir) => {
 
 }
 
-var findSongs = async function(directory) {
+var findSongs = async function(directory, event) {
     let musics = []
     let songCounter = 0
     let baseDir = directory.path
@@ -86,11 +86,11 @@ var findSongs = async function(directory) {
 
 
                         //   let image =  csongName+'.jpg'
-                        //   let artowrkAbsolutePath ='./public/'+image 
+                        //   let artowrkAbsolutePath ='./public/'+image
                         //   let hasArtwork = fs.existsSync(artowrkAbsolutePath)
-                        //   meta.artwork = hasArtwork ? image : 'default.jpg' 
+                        //   meta.artwork = hasArtwork ? image : 'default.jpg'
                         //   let color = await  Vibrant.from(hasArtwork ? artowrkAbsolutePath : './public/default.jpg' ).getPalette()
-                        //   meta.color = color       
+                        //   meta.color = color
                         meta.dirName = dirName
                         meta.directoryId = directory.id
                         meta.baseDir = baseDir
@@ -103,8 +103,8 @@ var findSongs = async function(directory) {
                             meta.title = name
                             // console.log(meta.title)
                         }
-                        let album = await createAlbum(meta)
-                        let song = await saveSong(meta, album)
+                      let album = await createAlbum(meta)
+                      let song = await saveSong(meta, album)
 
 
                         if (song[1] == true) {
@@ -113,8 +113,7 @@ var findSongs = async function(directory) {
                                 counter: songCounter,
                                 song: meta.title
                             }
-                            // console.log(emitData, 'new song ')
-                            // emit('NEW_SONG', emitData)
+                            event.sender.send('NEW_SONG', emitData)
 
                         }
 
@@ -129,7 +128,7 @@ var findSongs = async function(directory) {
             }
 
         }
-        // createAlbum(musics)  
+        // createAlbum(musics)
         return true
     } catch (e) {
         console.log(e, 'hhhh')
@@ -139,42 +138,44 @@ var findSongs = async function(directory) {
 
 async function createAlbum(song) {
     try {
-    let album= await  db.Album.findOrCreate({
+        let [album,isNewAlbum] = await db.Album.findOrCreate({
             where: {
                 title: song.album,
                 artist: song.artist
             }
-          })
-            if (album[1] == true) {
-                console.log('new record')
-                let fileName = song.title || song.album
-                let cleanFileName = fileName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+        })
+        if (isNewAlbum) {
+            console.log('new record')
+            let fileName = song.title || song.album
+            let cleanFileName = fileName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
 
-                let image = cleanFileName + '.jpg'
-                let artowrkAbsolutePath = process.cwd() +'/artworks/' + image
-                let artist = song.artist || ''
-                if (song.picture && song.picture.length > 0) {
-                    
-                  console.log(artowrkAbsolutePath,image,'hi' )
-                        let a = fs.writeFileSync(artowrkAbsolutePath, song.picture[0].data)
-                        await db.Album.update({
-                            artwork: image
-                        }, {
-                            where: {
-                                id: album[0].id
-                            }
-                        })
-         
-                }
+            let image = cleanFileName + '.jpg'
+          let artowrkAbsolutePath = process.cwd() + '/electron/artworks/' + image
+          console.log(artowrkAbsolutePath ,' path for image')
+            if (song.picture && song.picture.length > 0) {
 
-           
+                console.log(artowrkAbsolutePath, image, 'hi')
+                fs.writeFileSync(artowrkAbsolutePath, song.picture[0].data)
+                let a = await db.Album.update({
+                    artwork: image
+                }, {
+                    where: {
+                        id: album.id
+                    }
+                })
+              console.log(a,'aaaaaaaaaaaaaa',album.id)
+            } else {
+              console.log('nadarad')
             }
-            return album[0]
-           } catch (error) {
-               console.log(error)
-           }
 
-    return true 
+
+        }
+        return album
+    } catch (error) {
+        console.log(error)
+    }
+
+    return true
 
 }
 const saveArtwork = async (url, path) => {
@@ -204,7 +205,7 @@ const saveSong = async (meta, album) => {
         defaults: {
             title: meta.title,
             album: meta.album,
-            albummId: album.id,
+            albumId: album.id,
             directoryId: meta.directoryId,
             // artwork :meta.name,
             // fileName :meta.name,
@@ -215,10 +216,10 @@ const saveSong = async (meta, album) => {
             dirName: meta.dirName,
             fullPath: meta.fullPath,
             duration: meta.duration,
-            type : 'local'
+            type: 'local'
         }
     })
-return song 
+    return song
 }
 
 module.exports = {

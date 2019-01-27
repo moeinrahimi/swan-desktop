@@ -49,14 +49,28 @@ class LocalSongs extends Component {
   }
   async componentDidMount() {
     ipcRenderer.send('getSongs')
-    console.log('22222222')
-
     ipcRenderer.on('songs', (e, data) => {
-      console.log(data, '111111111')
       this.setState({
         songs: data
       })
     })
+     let toastId
+    ipcRenderer.on('NEW_SONG', (e, newSongInfo) => {
+
+ console.log(newSongInfo, 'NEW_SONG')
+ if (newSongInfo && newSongInfo.song) {
+     let message = `new song added :  ${newSongInfo.song} - ${newSongInfo.counter} `
+     if (toast.isActive(toastId)) {
+
+         toast.update(toastId, {
+             render: message
+         })
+     } else {
+
+         toastId = toast(message, { toastId: toastId })
+     }
+     }
+ })
     // this.setState({songs : favorited.favorites})
 
   }

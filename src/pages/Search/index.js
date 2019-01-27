@@ -9,14 +9,14 @@ class Search extends Component{
     super(props)
     this.state = {
       results : [],
-      
+
     }
   }
   _search(e){
     let q = e.target.value
      request.searchEverything(q)
     .then(result=>{
-      this.setState({results:result.result})
+      this.setState({results:result})
     })
   }
 
@@ -32,13 +32,13 @@ class Search extends Component{
       </div>
         </div>
         <div className="column">
-        <Albums 
+        <Albums
         albums={results}
         title={'Results'}
         />
         </div>
       </div>
-     
+
     )
   }
 }

@@ -4,15 +4,10 @@ const isDev = require('electron-is-dev');
 const db = require('./helpers/models');
 const dataurl = require('dataurl')
 const songHelper = require('./helpers/dbHelper/song')
-var static = require('node-static');
-console.log(__dirname + '/artworks')
-var fileServer = new static.Server(__dirname+'/artworks');
+const searchHelper = require('./helpers/dbHelper/search')
+const albumHelper = require('./helpers/dbHelper/album')
 const favoriteHelper = require('./helpers/favoriteSong')
-require('http').createServer(function(request, response) {
-    request.addListener('end', function() {
-        fileServer.serve(request, response);
-    }).resume();
-}).listen(8080);
+
 db.sequelize.sync(
   // {force: true}
 ).catch(err => {
@@ -32,9 +27,9 @@ ipcMain.on('saveDir', (event, arg) => {
   db.Directory.findOrCreate({
     where :{path:directory}
   }).then(dir=>{
-song.findSongs(dir[0])
+song.findSongs(dir[0], event)
   })
-  
+
 
 })
 
@@ -57,7 +52,7 @@ ipcMain.on('deleteFavortiteSong',async (event, arg) => {
 })
 
 ipcMain.on('favortiteSongs',async (event, arg) => {
-  
+
   let result = await favoriteHelper.favoritedSongs()
     event.sender.send('favoritedSongsResult', result)
 
@@ -73,15 +68,25 @@ const convertSong = (filePath) => {
   return songPromise;
 };
 ipcMain.on('songDataUrl', async (event, arg) => {
-
-
   let path = arg
   let songData = await convertSong(path)
   // console.log(songData ,' data ')
   event.sender.send('dataurl', songData)
+})
 
+ipcMain.on('searchSongs', async (event, arg) => {
+  let q = arg
+  let albums = await searchHelper.search(q)
+  // console.log(songData ,' data ')
+  event.sender.send('searchSongsResult', albums)
+})
 
-
+ipcMain.on('getAlbumSongs', async (event, arg) => {
+  let id = arg
+  console.log(id,'iddddddddd')
+  let albums = await albumHelper.getAlbumSongs(id)
+  console.log(albums ,' data ')
+  event.sender.send('getAlbumSongsSongsResult', albums)
 })
 
 
@@ -92,7 +97,7 @@ async function createWindow() {
   mainWindow = new BrowserWindow({
       width: 1800,
       height: 800,
-    
+
   })
 
   mainWindow.loadURL(isDev ? 'http://localhost:3001' : `file://${path.join(__dirname, '../build/index.html')}`);

@@ -9,3 +9,22 @@ export const getFavoritedSongsFromIPC = () => {
         })
     })
 }
+
+export const getAlbumSongsFromIPC = (id) => {
+    return new Promise((resolve, reject) => {
+        ipcRenderer.send('getAlbumSongs',id)
+        ipcRenderer.on('getAlbumSongsSongsResult', (e, songs) => {
+            return resolve(songs)
+        })
+    })
+}
+
+export const searchLocal = async (q) => {
+  return new Promise((resolve, reject) => {
+    ipcRenderer.send('searchSongs', q)
+    ipcRenderer.on('searchSongsResult', (e, data) => {
+      // console.log(data, 'searchSongsResult')
+      return resolve(data)
+    })
+  })
+}

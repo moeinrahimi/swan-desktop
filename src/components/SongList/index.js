@@ -1,3 +1,5 @@
+//TODO: search songs
+//TODO: get update when adding songs
 import React, { Component } from 'react';
 import favoritedSongs from "../../helpers/favortiedSongs";
 import Image from '../../components/Image';
@@ -43,20 +45,20 @@ class SongList extends Component{
   }
   playSong = async (song,index) => {
     // console.log(song)
-  this.props.setCurrentSong(song)    
-  this.props.setCurrentAlbum([])    
-  this.props.setSongs(this.props.songs)    
+  this.props.setCurrentSong(song)
+  // this.props.setCurrentAlbum([])
+  this.props.setSongs(this.props.songs)
   setTitle(song)
   setSongBasedOnPlatform(song,index,this.props)
   }
-  
+
   async componentDidMount(){
     let {data} = await axios(`${config.baseURL}playlists`)
     this.setState({
       playlists : data.playlists
     })
   }
-  
+
   toggleModal = ()=>{
     this.setState({
       showPlaylistModal : !this.state.showPlaylistModal,
@@ -72,19 +74,19 @@ class SongList extends Component{
     let {data} = await axios.post(`${config.baseURL}playlists/${playlist.id}`,{songId : this.state.songId})
     toast.success('song added to playlist successfully')
     this.toggleModal()
-  
-  
+
+
   }
-  
+
    _renderView = (song, index) => {
      let isFavorited = song.favoritedSong || song["favoritedSong.id"]
      let duration = '00:00'
      if(song.duration)
        duration = formatTime(song.duration)
     return (
-  
+
       <div className="song">
-  
+
         <div className="song-icon">
           <i className="fa fa-music"></i>
         </div>
@@ -95,7 +97,7 @@ class SongList extends Component{
           </div>
         </div>
         <div className="song-time">
-  
+
           <div className="dropdown is-hoverable">
             <div className="dropdown-trigger">
               <i className="fa fa-ellipsis-h" aria-haspopup="true" aria-controls="dropdown-menu3" ></i>
@@ -114,16 +116,16 @@ class SongList extends Component{
                     Add to Favorited Songs
                       </a>
                 }
-  
+
               </div>
             </div>
           </div>
           <span> { duration } </span>
-  
+
         </div>
-  
+
       </div>
-  
+
     )
   }
   render() {
@@ -152,18 +154,18 @@ class SongList extends Component{
   <button className="modal-close is-large" onClick={this.showPlaylistModal} aria-label="close"></button>
 
       </div>
-      
-    
+
+
     <div id="songs">
       {this.props.songs.map((song, index) => {
         return (
           <div key={song.id}  >
             {this._renderView(song, index)}
           </div>
-  
+
         )
       })}
-  
+
     </div>
     </div>
     )

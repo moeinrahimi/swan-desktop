@@ -1,24 +1,49 @@
 import axios from 'axios'
 import Sound from 'react-sound'
 import config from '../constants/config'
-import { isDesktop } from "./electron/utils";
 import helper from '../components/Player/helper'
+import {getAlbumSongsFromIPC} from './electron/ipcRequests'
 
 const electron = window.require('electron');
 const ipcRenderer = electron.ipcRenderer
 const play = async (album, reduxProps) => {
-    console.log(reduxProps, 'as')
+    // console.log(album, 'as')
+  let songs = []
+  try {
+
+    console.log(album, 'album')
+    if (album.type == 'local') {
+      console.log('is local')
+      songs = await getAlbumSongsFromIPC(album.id)
+      // songs = songs[0]
+      // songs.albummId = songs.albumId
+      console.log(songs,'data')
+    } else {
+      console.log('is remote')
     let { data } = await axios(config.baseURL + `album/songs?albumId=${album.id}`)
+      songs = data.songs
+    }
     reduxProps.setCurrentAlbum(album)
-    let song = data.songs[0]
+    let song = songs[0]
     reduxProps.setCurrentSong(song)
-    reduxProps.setSongs(data.songs)
+    reduxProps.setSongs(songs)
     setTitle(song)
     let songUrl = song.fullPath
+    if (album.type == 'local') {
+      ipcRenderer.send('songDataUrl', song.fullPath)
+      ipcRenderer.on('dataurl', (e, data) => {
+          let songBase64 = data
+          return setSongsData(songBase64, 0, song, reduxProps)
+      })
+      return
+    }
     songUrl = `${config.baseURL}songs/play?path=${encodeURIComponent(songUrl)}`
     setSrcAndPlay(reduxProps.audio, songUrl)
     setSongDetails(reduxProps, songUrl, Sound.status.PLAYING, 0, song.id)
     reduxProps.setIsPlaying(1)
+  } catch (error) {
+    console.log(error,'play')
+  }
 }
 
 const setTitle = (song) => {
